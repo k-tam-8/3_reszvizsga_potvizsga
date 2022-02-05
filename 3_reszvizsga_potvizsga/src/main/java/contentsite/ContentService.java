@@ -24,25 +24,27 @@ public class ContentService {
         int generatedPassword = pass.hashCode();
 
         if (!users.stream().anyMatch(u -> u.getUserName().equals(username))) {
-            throw new IllegalStateException("Username not found.");
+            throw new IllegalArgumentException("Username is wrong!");
         }
         for (User u : users) {
             if (u.getUserName().equals(username)) {
                 if (u.getPassword() != generatedPassword) {
-                    throw new IllegalStateException("Password not valid.");
+                    throw new IllegalArgumentException("Password is Invalid!");
                 } else u.setLogIn(true);
             }
         }
     }
 
     public void clickOnContent(User user, Content content) {
-        if (content.isPremiumContent()) {
-            if (user.isLogIn() && user.isPremiumMember()) {
-                content.click(user);
-            }
-        } else if (user.isLogIn()) {
-            content.click(user);
-        }
+
+        if (user.isLogIn()) {
+            if (content.isPremiumContent()) {
+                if (user.isPremiumMember()) {
+                    content.click(user);
+                } else throw new IllegalStateException("Upgrade for Premium to watch this content!");
+            } else content.click(user);
+
+        } else throw new IllegalStateException("Log in to watch this content!");
     }
 
     public Set<User> getAllUsers() {
